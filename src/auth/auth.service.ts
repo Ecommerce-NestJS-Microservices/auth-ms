@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 
 import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginUserDto } from './dto';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
@@ -41,6 +42,46 @@ export class AuthService extends PrismaClient implements OnModuleInit {
             })
 
             const { password: _, ...rest } = newUser;
+
+            return {
+                user: rest,
+                token: 'ABC'
+            }
+        } catch (error) {
+            throw new RpcException({
+                status: 400,
+                message: error.message
+            })
+        }
+    }
+
+    async loginUser(loginUserDto: LoginUserDto) {
+
+        const { email, password } = loginUserDto;
+        try {
+            const user = await this.user.findUnique({
+                where: {
+                    email: email,
+                }
+            })
+
+            if (!user) {
+                throw new RpcException({ // this is as far as we go
+                    status: 400,
+                    message: 'User/Password not valid - email' // if it failed by email in depurate
+                })
+            }
+
+            const isPasswordValid = bcrypt.compareSync(password, user.password)
+            
+            if (!isPasswordValid) {
+                throw new RpcException({
+                    status: 400,
+                    message: 'User/Password not valid'
+                })
+            }
+
+            const { password: _, ...rest } = user;
 
             return {
                 user: rest,
