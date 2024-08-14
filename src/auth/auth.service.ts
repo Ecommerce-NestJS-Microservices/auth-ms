@@ -7,14 +7,26 @@ import * as bcrypt from 'bcrypt';
 
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
+
+    constructor(
+        private readonly jwtService: JwtService,
+    ) {
+        super();
+    }
 
     private readonly logger = new Logger('AuthService')
     onModuleInit() {
         this.$connect();
         this.logger.log('MongoDB connected')
+    }
+
+    async signJWT(payload: JwtPayload) {
+        return this.jwtService.sign(payload);
     }
 
     async registerUser(registerUserDto: RegisterUserDto) {
@@ -45,7 +57,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
 
             return {
                 user: rest,
-                token: 'ABC'
+                token: await this.signJWT(rest)
             }
         } catch (error) {
             throw new RpcException({
@@ -73,7 +85,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
             }
 
             const isPasswordValid = bcrypt.compareSync(password, user.password)
-            
+
             if (!isPasswordValid) {
                 throw new RpcException({
                     status: 400,
@@ -85,7 +97,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
 
             return {
                 user: rest,
-                token: 'ABC'
+                token: await this.signJWT(rest)
             }
         } catch (error) {
             throw new RpcException({

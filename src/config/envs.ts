@@ -5,6 +5,7 @@ interface EnvVars {
     PORT: number;
 
     NATS_SERVERS: string[];
+    JWT_SECRET: string;
 
     // PRODUCTS_MICROSERVICES_HOST: string;
     // PRODUCTS_MICROSERVICES_PORT: number;
@@ -15,6 +16,7 @@ const envsSchema = joi.object({
     PORT: joi.number().required(),
 
     NATS_SERVERS: joi.array().items(joi.string()).required(),
+    JWT_SECRET: joi.string().required(),
     // PRODUCTS_MICROSERVICES_HOST: joi.string().required(),
     // PRODUCTS_MICROSERVICES_PORT: joi.number().required(),
 
@@ -36,7 +38,8 @@ const envVars: EnvVars = value;
 export const envs = {
     port: envVars.PORT,
 
-    natsServers: envVars.NATS_SERVERS
+    natsServers: envVars.NATS_SERVERS,
+    jwtSecret: envVars.JWT_SECRET,
     // productMicroserviceHost: envVars.PRODUCTS_MICROSERVICES_HOST,
     // productMicroservicePort: envVars.PRODUCTS_MICROSERVICES_PORT,
 
