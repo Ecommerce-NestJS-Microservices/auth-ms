@@ -64,7 +64,7 @@ COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
 #environment variable (optional)
-ENV NODE_ENV=production
+#ENV NODE_ENV=production
 
 #Create user named node and move to it, this user, execute the follow, the user that come from this image, have got a lot of privilege, it could delete code, directories
 #It only have execution privilege
